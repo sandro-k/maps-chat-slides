@@ -1,0 +1,137 @@
+Polymer
+* Intro
+** Global Polymer object in the DOM
+** What are WebComponents
+*** HTML imports
+*** Shadow DOM vs Shady DOM
+*** Templates
+*** Custom Elements
+**** have to contain a dash in the name like x-foo
+
+** declarative vs imperative
+
+* What is MQTT
+** Publish/ Subscribe protocol
+** Broker based
+** Communication over topics e.g. mood/of/sandro
+** connect("ws://localhost:8083")
+** subscribe("mood/of/sandro")
+** publish("mood/of/sandro", "excited")
+
+* Demo
+** maps-chat
+*** <geo-location>
+*** <google-maps>
+*** <mqtt-elements>
+*** <map-chat>
+
+* Polymer
+** <dom-module>
+
+** Data Binding
+*** <element prop=”{{property\|path}}”>
+*** via JavaScript getter and Setter on properties
+*** OneWay
+*** TwoWay
+
+** Properties
+*** types
+**** Boolean, String, Number, Object, Array and Function
+***** boolean should be false
+*** default
+**** function(){return {}}
+*** observers
+**** fired when
+*** computed: fn
+*** readOnly: true
+*** notify: true
+*** public non default constructor
+**** factoryImpl: fn(a, b)
+
+** hostAttributes
+*** Static on the host
+
+** Template
+*** dom-bind
+*** dom-if
+**** restamp
+*** dom-repeat
+**** as
+**** observe
+**** filter
+**** sort
+**** dom-repeat#itemForElement
+
+** livecycle callbacks
+*** created
+*** ready (bottom up)
+*** attached
+*** detached
+*** attributeChanged
+
+** listeners
+*** imperative listeners : {"event":"fn"}
+*** declarative <x-foo on-fire="fn">
+
+** Observers
+*** property observers: ['observerFn(a, b)']
+*** path observers: ['observerFn(a.prop)']
+*** depp path observers: ['observerFn(a.*)']
+*** array observers: ['observerFn(a.splice)']
+
+** Local DOM
+*** <content> Tag
+**** selector attribute
+
+
+** Styling
+*** :root, :host, ::content sudo class
+*** <style is="custom-style">
+**** background: --my-fancy-color: #0F0FFF;
+**** html import to include external stylesheets
+
+** Utility Functions
+*** toggleClass
+*** toggleAttribute
+*** classFollows
+*** attributeFollows
+*** getContentChildNodes
+*** getContentChildren
+*** fire
+*** async
+*** cancelAsync
+*** arrayDelete
+*** transform
+*** translate3d
+*** importHref
+*** create
+
+** Polymer settings
+** Polymer = { dom: 'shadow' };
+** URL query parameter ?dom=shadow or ?dom=shady
+
+** Array Mutations
+*** this.push(path, value)
+*** this.pop(path)
+*** this.splice(path) TODO
+*** this.shift(path) TODO
+*** this.unshift(path) TODO
+
+** DOM
+*** Local DOM
+*** Light DOM
+
+
+** Polymer.dom API
+** this.$ property
+
+** Gesture events
+
+* WebComponent Tester (wct)
+
+
+
+
+
+
+
