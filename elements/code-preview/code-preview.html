@@ -1,0 +1,635 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="prism-import.html">
+
+<dom-module id="code-preview">
+
+  <template>
+
+    <style>
+
+      :host {
+        width: 1000px;
+        background: white;
+        border: 1px solid #e0e0e0;
+      }
+
+      :host([size-that-fits]) {
+        display: block;
+      }
+
+      :host(:not([size-that-fits])) {
+        @apply(--layout);
+        @apply(--layout-vertical);
+        height: 500px;
+      }
+
+      :host[fullscreen] {
+        @apply(--layout);
+        @apply(--layout-vertical);
+
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto;
+        min-width: none;
+        max-width: none;
+        height: auto;
+        min-height: none;
+        max-height: none;
+        border: none;
+        margin: 0;
+        z-index: 1000;
+      }
+
+      paper-button {
+        color: #616161;
+        border-radius: 0;
+        margin: 0px;
+        min-width: auto;
+        padding: 0 10px;
+      }
+
+      paper-button[toggles] {
+        font-size: 13px;
+        line-height: 46px;
+      }
+
+      paper-button[active] {
+        font-weight: bold;
+        color: black;
+      }
+
+      .toolbar {
+        @apply(--paper-font-common-base);
+        height: 44px;
+        background-color: var(--code-preview-toolbar-bg-color, #e0e0e0);
+        padding-left: 24px;
+        display: flex;
+        line-height: 44px;
+      }
+
+      .label{
+        font-size: 15px;
+        font-weight: bold;
+        color: var(--code-preview-toolbar-color, black);
+        line-height: 44px;
+        cursor: default;
+        -webkit-flex: 1 1;
+        flex: 1 1;
+      }
+
+      #content {
+        position: relative;
+        overflow: hidden;
+      }
+
+      :host(:not([vertical])) #content {
+        @apply(--layout-flex);
+        @apply(--layout-horizontal);
+      }
+
+      :host([vertical]:not([size-that-fits])) #content {
+        @apply(--layout-flex);
+        @apply(--layout-vertical);
+      }
+
+      #copyButton {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        border-radius: 50%;
+      }
+
+      #preview {
+        @apply(--layout-flex);
+        @apply(--layout);
+        @apply(--layout-horizontal);
+      }
+
+      #preview iframe {
+        @apply(--layout-flex);
+      }
+
+      #sourceCode {
+        @apply(--layout-flex);
+        overflow: auto;
+      }
+
+      :host(:not([vertical])) #sourceCode {
+        border-left: 1px solid #e0e0e0;
+      }
+
+      :host([vertical]) #sourceCode {
+        border-top: 1px solid #e0e0e0;
+      }
+
+      pre {
+        font-family: Menlo, Courier, monospace;
+        font-size: 12px;
+        line-height: 18px;
+        position: relative;
+        padding: 20px;
+      }
+
+      .highlight {
+        position: absolute;
+        left: 0;
+        right: 0;
+        padding: inherit 0;
+        background: #9fa8da;
+        pointer-events: none;
+        line-height: inherit;
+        white-space: pre;
+        transition: opacity 0.2s;
+        opacity: 0;
+        line-height: 18px;
+      }
+
+      .highlight.visible {
+        opacity: 0.2;
+      }
+
+      .toast {
+        @apply(--paper-font-common-base);
+        background-color: #333;
+        color: white;
+        text-align: center;
+        font-size: 13px;
+        position: absolute;
+        bottom: 10px;
+        right: 60px;
+        padding: 10px;
+        opacity: 0;
+        border-radius: 5px;
+        -webkit-transform: translate3d(0px, 40px, 0px);
+        transform: translate3d(0px, 40px, 0px);
+
+        -webkit-transition-property: transform, opacity;
+        transition-property: transform, opacity;
+
+        -webkit-transition-duration: 0.2s;
+        transition-duration: 0.2s;
+
+        -webkit-transition-timing-function: ease-out;
+        transition-timing-function: ease-out;
+      }
+
+      .toast.visible {
+        opacity: 1;
+        transform: translate3d(0px, 0px, 0px);
+        -webkit-transform: translate3d(0px, 0px, 0px);
+      }
+
+      #localContent {
+        overflow-y: auto;
+        width: 100%;
+        padding: 20px;
+        background-color: #fafafa;
+      }
+    </style>
+
+    <iron-ajax auto url="[[src]]" on-response="_renderExternalContent" handle-as="text" id="xhr"></iron-ajax>
+
+    <div class="toolbar">
+      <div class="label">[[label]]</div>
+      <paper-button toggles active="{{hasPreview}}">Preview</paper-button>
+      <paper-button toggles active="{{hasCode}}">Code</paper-button>
+      <paper-button on-tap="_toggleFullScreen">
+        <iron-icon icon="[[_getFullscreenIcon(fullscreen)]]"></iron-icon>
+      </paper-button>
+    </div>
+
+    <div id="content">
+      <div id="preview" hidden$="[[!hasPreview]]">
+        <div id="localContent">
+          <content select="*"></content>
+        </div>
+      </div>
+      <div id="sourceCode" hidden$="[[!hasCode]]">
+        <pre id="pre"></pre>
+      </div>
+      <paper-icon-button id="copyButton" icon="content-copy" on-tap="_copyCode" title="Copy"></paper-icon-button>
+    </div>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'code-preview',
+
+      properties: {
+        label: {
+          type: String,
+          value: 'Empty'
+        },
+
+        src: {
+          type: String,
+          value: null
+        },
+
+        hasCode: {
+          type: Boolean,
+          value: true
+        },
+
+        hasPreview: {
+          type: Boolean,
+          value: true
+        },
+
+        fullscreen: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        }
+      },
+
+      _lines: null,
+
+      _pre: null,
+
+      observers: [
+        '_srcChanged(src)'
+      ],
+
+      _srcChanged: function(src) {
+        if (src) {
+          // external content
+          if (!this._iframe) {
+            this._iframe = document.createElement('iframe');
+            this._iframe.frameBorder = 0;
+            // event handler when the iframe has loaded
+            this._iframe.addEventListener('load', this._iframeDidLoad.bind(this));
+            Polymer.dom(this.$.preview).appendChild(this._iframe);
+          }
+          this._iframe.style.display = '';
+          this.$.localContent.style.display = 'none';
+        } else {
+          // local content
+          if (this._iframe) {
+            this._iframe.style.display = 'none';
+          }
+
+          if (!this._localContentEvent) {
+            this._localContentEvent = this._handleMouseMove.bind(this, document, window);
+            this.addEventListener('mousemove', this._localContentEvent);
+          }
+
+          this.$.localContent.style.display = '';
+          this._renderLocalContent();
+        }
+      },
+
+      _renderSourceCode: function(src) {
+        this._lines = this._mapLines(src);
+        this.$.pre.innerHTML = Prism.highlight(src, Prism.languages.markup);
+      },
+
+      _renderLocalContent: function() {
+        var src = Polymer.dom(this).innerHTML;
+
+        src = this._unindent(src);
+        this._renderSourceCode(src);
+      },
+
+      _renderExternalContent: function() {
+        var src = this.$.xhr.lastResponse;
+
+        src = this._unindent(src);
+        src = this._fixBase(src);
+
+        this._iframe.src = this._getObjectURL(src);
+        this._renderSourceCode(src);
+      },
+
+      _unindent: function(src) {
+        var shiftSpaces = null;
+        var lines = src.split('\n');
+
+        lines = lines.map(function(str) {
+          if (shiftSpaces !== null) {
+            return str.substr(shiftSpaces);
+          }
+
+          var newLine = str.replace(/^\s+/g, '');
+          if (newLine !== '') {
+            shiftSpaces = str.length - newLine.length;
+          }
+          return newLine;
+        });
+
+        return lines.join('\n').trim();
+      },
+
+      _toggleFullScreen: function(e) {
+        this.fullscreen = !this.fullscreen;
+      },
+
+      _getFullscreenIcon: function(fullscreen) {
+        return (fullscreen) ? 'fullscreen-exit' : 'fullscreen';
+      },
+
+      _getObjectURL: function(src) {
+        return URL.createObjectURL(new Blob([src], {type : 'text/html'}));
+      },
+
+      _fixBase: function(src) {
+        var base = new URL(this.src, location.href).href;
+        var headTag = '<head>';
+        var baseTag = '<base href="' + base + '">';
+        return src.replace(headTag, headTag + baseTag);
+      },
+
+      _iframeDidLoad: function() {
+        var iframeDoc = this._iframe.contentDocument;
+        var iframeWin = this._iframe.contentWindow;
+
+        if (iframeWin.Polymer) {
+          iframeDoc.addEventListener('mousemove',
+              this._handleMouseMove.bind(this, iframeDoc, iframeWin));
+        }
+      },
+
+      _mapLines: function(html) {
+        var path, relPath, childNum;
+        var map = {};
+        var inTag = true;
+        var openTag = false;
+        var tagName = '';
+        var stack = [];
+        var line = 1;
+        var pathsFound = {};
+        // these elements don't have an ending tag
+        var singleTag = {
+          'META': 1, 
+          'BR': 1, 
+          'LINK': 1, 
+          'IMG': 1, 
+          'BASE': 1
+        };
+        var TOKEN = {
+          startTag: '<',
+          endTag: '>',
+          endTagSlash: '/',
+          exclamation: '!',
+          space: ' '
+        };
+
+        for (var i = 0; i < html.length; i++) {
+          var character = html.charAt(i);
+          if (character === TOKEN.startTag) {
+            inTag = true;
+            openTag = -1;
+          } else if (character === TOKEN.endTag) {
+            inTag = false;
+            if (tagName !== '') {
+              tagName = tagName.toUpperCase();
+              if (openTag) {
+                path = stack.join(':');
+                if (path in pathsFound) {
+                  childNum = ++pathsFound[path];
+                } else {
+                  childNum = 0;
+                  pathsFound[path] = childNum;
+                }
+
+                stack.push(childNum);
+                path = stack.join(':');
+                if (singleTag[tagName]) {
+                  map[path] = {start: line, end: line};
+                  stack.pop();
+                } else {
+                  map[path] = {start: line};
+                }
+              } else if (stack.length > 0) {
+                map[stack.join(':')].end = line;
+                stack.pop();
+              }
+              tagName = '';
+            }
+          } else {
+            if (inTag) {
+              // the tag is a comment e.g. `<!` or invalid
+              if (character === TOKEN.exclamation || character === TOKEN.space) {
+                inTag = false;
+              } else {
+                if (openTag === -1) {
+                  openTag = (character !== TOKEN.endTagSlash);
+                  if (openTag) {
+                    tagName += character;
+                  }
+                } else {
+                  tagName += character;
+                }
+              }
+            }
+          }
+          if (character === '\n') {
+            line++;
+          }
+        }
+        return map;
+      },
+
+      _handleMouseMove: function(doc, win, event) {
+        var Polymer = win.Polymer;
+
+        function getChildrenNumber(children, node) {
+          var childNumber = 0;
+          for (var i = 0; i < children.length && children[i] != node; i++) {
+            childNumber++;
+          }
+          return (children[i] == node) ? childNumber : 0;
+        }
+
+        var targetElement = Polymer.dom(event).localTarget;
+        var rootNode = (this.src) ? doc : this;
+        var fullPath;
+
+        if (targetElement.__fullPath) {
+          fullPath = targetElement.__fullPath;
+        } else {
+          if (targetElement != doc.body && targetElement != this) {
+            var path = [];
+            var node = targetElement;
+            while (node && node !== rootNode) {
+              var i = 0, templateIndex = 0;
+              var nodeCameFromTemplate = false;
+              var elementNodes = 0;
+              var childNumber;
+              var parentEl = Polymer.dom(node).parentNode;
+              var children = Polymer.dom(parentEl).children;
+              var domBindTemplates = parentEl.querySelectorAll('template[is=dom-bind]');
+              for (; i < domBindTemplates.length; i++) {
+                elementNodes = 0;
+                nodeCameFromTemplate = false;
+                domBindTemplates[i]._children.forEach(function(templateNode) {
+                  if (templateNode.nodeType === Node.ELEMENT_NODE) {
+                    elementNodes++;
+                    if (node == templateNode) {
+                      nodeCameFromTemplate = true;
+                      templateIndex = getChildrenNumber(children, domBindTemplates[i]);
+                    }
+                  }
+                });
+              }
+              if (nodeCameFromTemplate) {
+                path.unshift(getChildrenNumber(children, node));
+                path.unshift(templateIndex - elementNodes);
+              } else {
+                // special cases
+                if (node.tagName === 'IRON-LIST') {
+                  path.splice(0, 1, 0, 0);
+                }
+                path.unshift(getChildrenNumber(children, node) );
+              }
+              node = parentEl;
+            }
+            fullPath = path.join(':');
+          } else {
+            fullPath = '';
+          }
+          targetElement.__fullPath = fullPath;
+        }
+        this._highlightMarkup(fullPath);
+      },
+
+      _highlightMarkup: function(path) {
+        if (path) {
+          var highlight = this._highlightLines(this._lines[path]);
+          if (highlight && !this.sizeThatFits) {
+            highlight.scrollIntoViewIfNeeded();
+          }
+        } else {
+          this._highlightLines(null);
+        }
+      },
+
+      _isSameHighlight: function(lines) {
+        return lines && this._lastLines
+            && lines.start === this._lastLines.start && lines.end === this._lastLines.end;
+      },
+
+      _removeCurrentHighlights: function() {
+        var currentHighlights = [].slice.call(this.$.pre.getElementsByClassName('highlight'), 0);
+
+        // remove current highlights
+        currentHighlights.forEach(function(node) {
+          if (node.classList.contains('visible')) {
+            node.classList.remove('visible');
+            setTimeout(function() {
+              node.parentNode.removeChild(node);
+            }, 500);
+          }
+        });
+      },
+
+      _highlightLines: function(lines) {
+        if (this._isSameHighlight(lines)) {
+          return;
+        }
+
+        this._removeCurrentHighlights();
+
+        this._lastLines = lines;
+
+        if (!lines) {
+          return;
+        }
+
+        var start = lines.start;
+        var end = lines.end || lines.start;
+        var selDiv = document.createElement('div');
+
+        // fill up the div
+        selDiv.textContent = Array(end - start + 2).join(' \n');
+        // set the y position
+        selDiv.style.top = this._getHighlightOffsetY(start) + 'px';
+
+        selDiv.classList.add('highlight');
+        Polymer.dom(this.$.pre).appendChild(selDiv);
+
+        // force layout and make the div visible
+        selDiv.offsetWidth && selDiv.classList.add('visible');
+
+        return selDiv;
+      },
+
+      _getHighlightOffsetY: function(start) {
+        if (!this._preStyles) {
+          var preStyles = getComputedStyle(this.$.pre);
+          this._preStyles = {
+            lineHeight: parseFloat(preStyles.lineHeight),
+            paddingTop: parseFloat(preStyles.paddingTop)
+          };
+        }
+
+        return (start - 1) *  this._preStyles.lineHeight +  this._preStyles.paddingTop;
+      },
+
+      _copyCode: function(e) {
+        var global = window;
+        var successMsg = 'Code copied to clipboard';
+        var errorMsg = 'Can\'t copy code to clipboard';
+        var range = document.createRange();
+
+        range.selectNode(this.$.sourceCode);
+
+        global.getSelection().addRange(range);
+
+        try {
+          var successful = document.execCommand('copy');
+          this._showToast(successful ? successMsg : errorMsg);
+        } catch(err) {
+          this._showToast(errorMsg);
+        }
+
+        // deselect
+        global.getSelection().removeAllRanges();
+      },
+
+      _showToast: function(text) {
+        if (!this._toast) {
+          this._toast = document.createElement('div');
+          this._toast.classList.add('toast');
+          Polymer.dom(this.$.content).appendChild(this._toast);
+        }
+        this._toast.innerHTML = text;
+
+        // force layout and make the toast visible
+        this._toast.offsetWidth && this._toast.classList.add('visible');
+
+        this.async(function() {
+          this._toast.classList.remove('visible');
+        }, 1500);
+      }
+
+    });
+
+  </script>
+
+</dom-module>

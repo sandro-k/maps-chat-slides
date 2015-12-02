@@ -1,0 +1,18 @@
+<mqtt-connection
+    url="ws://localhost:8080"
+    qos="1"
+    mqtt-client="{{mqttClient}}"
+    options='{reconnectPeriod: 1000}'>
+
+  <mqtt-subscription
+      topic="current/weather/hamburg"
+      last-message="{{currentWeatherInHamburg}}"
+      qos="1" ></mqtt-subscription>
+
+  <mqtt-publish
+      topic="current/weather/hamburg"
+      payload="probably rainy"
+      qos="1"
+      auto></mqtt-publish>
+
+</mqtt-connection>

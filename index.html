@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport">
+  <title>maps-chat-slides</title>
+  <link rel="import" href="bower_components/paper-styles/paper-styles.html">
+  <link rel="import" href="elements/code-preview/code-preview.html">
+  <link rel="import" href="bower_components/paper-material/paper-material.html">
+  <link rel="import" href="bower_components/paper-card/paper-card.html">
+  <link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+  <link rel="import" href="bower_components/paper-elements/paper-elements.html">
+  <link rel="import" href="bower_components/marked-element/marked-element.html">
+  <link rel="import" href="elements/maps-chat-presi.html">
+  <link rel="import" href="elements/a-slide.html">
+
+  <style is="custom-style">
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      @apply(--paper-font-common-base);
+    }
+
+    li {
+      @apply(--paper-font-common-base);
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 28px;
+    }
+
+    a {
+      color: #00b0ff;
+    }
+
+    maps-chat-presi {
+      @apply(--layout-fullbleed);
+    }
+
+    a-slide {
+      @apply(--layout);
+      @apply(--layout-vertical);
+    }
+
+    h1[header] {
+      font-weight: 200;
+    }
+
+    h1[header] span {
+      background: #FFF;
+      color: #043C53;
+      padding: 0.25em 1em 0.25em 0.5em;
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
+      @apply(--shadow-elevation-2dp);
+    }
+
+    div[content] {
+      @apply(--layout);
+      color: #043C53;
+      @apply(--layout-horizontal);
+      @apply(--layout-self-stretch);
+    }
+
+    div[content] h1 {
+      @apply(--paper-font-display2);
+    }
+
+    .card {
+      background: #FFF;
+      margin: 0 1em;
+      padding: 1em;
+      @apply(--shadow-elevation-2dp);
+      @apply(--layout-flex);
+      border-radius: 6px;
+    }
+
+    .card.center {
+      @apply(--layout);
+      @apply(--layout-flex);
+      @apply(--layout-vertical);
+    }
+
+    .card.gone {
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+
+    a-slide:nth-child(3n+0) {
+      background: var(--paper-green-700);
+    }
+
+    a-slide:nth-child(3n+1) {
+      background: #27A8DE;
+    }
+
+    a-slide:nth-child(3n+2) {
+      background: var(--paper-pink-a400);
+    }
+
+  </style>
+</head>
+<body class="fullbleed layout vertical">
+
+<maps-chat-presi>
+
+  <a-slide>
+    <h1 header>
+      <span>Google Developer Group Hamburg</span>
+    </h1>
+    <div content>
+      <div class="card">
+        <h1>Polymer - Merging the physical and digital world.</h1>
+      </div>
+      <div class="card">
+        <img class="flex" src="assets/gdghh.jpeg" alt="">
+      </div>
+    </div>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>about me</span></h1>
+    <div content>
+      <div class="card">
+        <div>
+          <ul>
+            <li>GitHub -
+              <a href="https://github.com/sandro-k">sandro-k</a>
+            </li>
+            <li>twitter -
+              <a href="https://twitter.com/_syn_k">@_syn_k</a>
+            </li>
+            <li>
+              <a href="https://github.com/mqttjs/mqtt-elements">&lt;mqtt-elements&gt;</a>
+              -
+              <a href="https://mqttjs.github.io/mqtt-elements">demo</a>
+            </li>
+            <li>
+              MQTTlens -
+              <a href="https://chrome.google.com/webstore/detail/mqttlens/hemojaaeigabkbcookmlgmdigohjobjm">Chrome</a>
+              <a href="https://github.com/sandro-k/MQTTLensChromeApp">GitHub</a>
+            </li>
+            <li>
+              Slides -
+              <a href="https://sandro-k.github.io/maps-chat-slides">live</a>
+              <a href="https://github.com/sandro-k/maps-chat-slides">source</a>
+            </li>
+            <li>
+              Work -
+              <a href="http://ssv-embedded.de/">SSV Software Systems GmbH</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <img width="200px" style="border-radius: 50%" src="assets/sandro.jpeg" alt="">
+      </div>
+    </div>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>What are WebComponents?</span></h1>
+    <div content>
+      <div class="card">
+        <ul>
+          <li>HTML Imports</li>
+          <ul>
+            <li>
+              <pre>&lt;link rel="import" href="URL"&gt;</pre>
+            </li>
+          </ul>
+
+          <li>Templates</li>
+          <ul>
+            <li>
+              <pre>
+&lt;template id="customTemplate"&gt;
+  &lt;h1&gt;Hello world!&lt;/h1&gt;
+&lt;/template&gt;
+              </pre>
+            </li>
+          </ul>
+          <li>Shadow DOM vs Shady DOM</li>
+          <ul>
+            <li>
+              <pre>
+&lt;dom-module id=&quot;a-slide&quot;&gt;
+  &lt;template&gt;
+    &lt;h1&gt;Hello world!&lt;/h1&gt;
+  &lt;/template&gt;
+&lt;/dom-module&gt;
+              </pre>
+            </li>
+          </ul>
+        </ul>
+      </div>
+      <div class="card">
+        <ul>
+          <li>Custom Elements</li>
+            <pre style="font-size: 16px">
+&lt;script&gt;
+var proto =
+  Object.create(HTMLElement.prototype, {
+  createdCallback: {
+    value: function() {
+    var t = document.
+      querySelector('#customTemplate');
+    var clone = document.
+      importNode(t.content, true);
+      this.createShadowRoot().appendChild(clone);
+      }
+    }
+  }
+);
+document.
+  registerElement('demo-element',{prototype: proto});
+&lt;/script&gt;
+            </pre>
+        </ul>
+      </div>
+
+    </div>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>Polymer 1.0</span></h1>
+    <div content>
+      <div class="card enumerate">
+        <ul>
+          <li>
+            native support for WebComponents?
+          </li>
+          <li>
+            Webcomponents.js is a Polyfill for browser that currently not support Web Components
+          </li>
+          <li>
+            Polymer is a <s>framework</s> library to create reusable custom elements
+          </li>
+          <li>
+            <a href="https://elements.polymer-project.org/">Polymer Catalog</a>
+          </li>
+          <ul>
+            <li>Iron Elements - Polymer core elements</li>
+            <li>Paper Elements - Material design elements</li>
+            <li>Google Web Components - Components for Google's APIs and services</li>
+            <li>....</li>
+          </ul>
+          <li>
+            <a href="https://ebidel.github.io/material-playground/" target="_blank">material-playground</a>
+            <a href="https://github.com/ebidel/material-playground" target="_blank">source</a>
+          </li>
+        </ul>
+      </div>
+      <div class="card center">
+        <img height="300px" class="icons" src="http://www.polymer-project.org/images/logos/p-logo.svg">
+      </div>
+    </div>
+  </a-slide>
+
+  <a-slide>
+
+    <code-preview src="elements/seed-element.html"
+                  label="Seed element"
+                  size-that-fits
+                  fullscreen
+                  content></code-preview>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>declarative vs imperative</span></h1>
+    <div content>
+      <div class="card">
+        <pre>
+&lt;iron-ajax
+  url=&quot;api.github.com/users/sandro-k/repos&quot;
+  last-response=&quot;{{repos}}
+  auto&quot;&gt;&lt;/iron-ajax&gt;
+        </pre>
+        <iron-ajax
+            url="https://api.github.com/users/sandro-k/repos"
+            auto
+            last-response="{{repos}}"></iron-ajax>
+
+      </div>
+      <div class="card">
+        <div>
+          <pre>
+&lt;script type=&quot;text/javascript&quot;&gt;
+  function loadXMLDoc() {
+    var xmlhttp;
+
+   if (window.XMLHttpRequest) {
+    // code for IE7+, Firefox,
+    // Chrome, Opera, Safari
+    xmlhttp = new XMLHttpRequest();
+   } else {
+    // code for IE6, IE5
+    xmlhttp =
+      new ActiveXObject(&quot;Microsoft.XMLHTTP&quot;);
+   }
+
+  xmlhttp.onreadystatechange = function() {...}
+
+  xmlhttp.open(
+    &quot;GET&quot;,
+    &quot;api.github.com/users/sandro-k/repos&quot;,
+    true
+  );
+
+  xmlhttp.send();
+}
+&lt;/script&gt;
+          </pre>
+        </div>
+      </div>
+    </div>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>Data Binding</span></h1>
+    <div content>
+      <div class="card">
+        <div>
+          <h2>two way data binding with <code>{{var}}</code></h2>
+          <img style="width: 100%; height: 100%" src="assets/twoWayDataBinding.png" alt="">
+        </div>
+      </div>
+      <div class="card">
+        <div>
+          <h2>one way data binding with <code>[[var]]</code></h2>
+          <img style="width: 100%; height: 100%" src="assets/oneWayDataBinding.png" alt="">
+        </div>
+      </div>
+    </div>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>Observers</span></h1>
+    <div content>
+      <div class="card">
+        <ul>
+          <li>property observers: <code>['observerFn(a, b)']</code></code></li>
+          <li>path observers: <code>['observerFn(a.prop)']</code></li>
+          <li>depp path observers: <code>['observerFn(a.*)']</code></li>
+          <li>array observers: <code>['observerFn(a.splice)']</code></li>
+        </ul>
+      </div>
+      <div class="card gone"></div>
+    </div>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>Events & Listeners</span></h1>
+    <div content>
+      <div class="card">
+        <ul>
+          <li>
+            <code>this.fire("make-it-run", {number: 42});</code>
+          </li>
+          <li>
+            <code>listeners: {"make-it-run": "_functionToRun"}</code>
+          </li>
+        </ul>
+      </div>
+      <div class="card">
+        <ul>
+          <li><code>event-element on-make-it-run="_functionToRun"</code></li>
+        </ul>
+      </div>
+    </div>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>What is MQTT</span></h1>
+    <div content>
+      <div class="card">
+        <h3>Publish/ Subscribe protocol</h3>
+        <ul>
+          <li>Broker based</li>
+          <li>Communication over topics e.g. mood/of/sandro</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h1></h1>
+        <div>
+          <ul>
+            <li>connect("ws://localhost:8080")</li>
+            <li>subscribe("mood/of/sandro")</li>
+            <li>publish("mood/of/sandro", "excited")</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>mqtt-elements</span></h1>
+    <div content>
+      <div class="card">
+        <ul>
+          <li>mqtt-connection</li>
+          <li>mqtt-subscription</li>
+          <li>mqtt-publish</li>
+        </ul>
+      </div>
+      <div class="card">
+<marked-element>
+<script type="text/markdown">
+```
+<mqtt-connection
+ url="ws://localhost:8080"
+ qos="1"
+ mqtt-client="{{mqttClient}}"
+ options='{reconnectPeriod: 1000}'>
+
+ <mqtt-subscription
+  topic="current/weather/hamburg"
+  last-message="{{currentWeatherInHamburg}}"
+  qos="1" ></mqtt-subscription>
+
+ <mqtt-publish
+  topic="current/weather/hamburg"
+  payload="probably rainy"
+  qos="1"
+  auto></mqtt-publish>
+
+</mqtt-connection>
+```
+</script>
+        </marked-element>
+      </div>
+    </div>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>maps-chat demo</span></h1>
+    <div content>
+      <div class="card">
+        <h1></h1>
+        <div>
+          <ul>
+            <li>
+              <a href="https://github.com/ebidel/geo-location">&lt;geo-location&gt;</a>
+            </li>
+            <li>&lt;google-maps&gt;</li>
+            <li>&lt;iron-localstorage&gt;</li>
+            <li>&lt;mqtt-elements&gt;</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card "></div>
+    </div>
+  </a-slide>
+
+  <a-slide>
+    <code-preview src="demo/geo-location.html"
+                  label="geo-location example"
+                  size-that-fits
+                  fullscreen
+                  content></code-preview>
+  </a-slide>
+
+  <a-slide>
+    <code-preview src="demo/google-maps.html"
+                  label="google-maps example"
+                  size-that-fits
+                  fullscreen
+                  content></code-preview>
+  </a-slide>
+
+  <a-slide>
+    <code-preview src="demo/local-storage.html"
+                  label="local-storage example"
+                  size-that-fits
+                  fullscreen
+                  content></code-preview>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>Properties</span></h1>
+    <div content>
+      <div class="card">
+        <marked-element>
+          <script type="text/markdown">
+```json
+properties: {
+  var: {
+    type: Boolean, String, Number, Object, Array and Function,
+    notify: true,
+    value: 7
+  },
+
+  items: {
+    type: Array
+    notify: true,
+    value: function(){
+        return [];
+      }
+  }
+}
+```
+          </script>
+        </marked-element>
+      </div>
+      <div class="card">
+        <marked-element>
+          <script type="text/markdown">
+```json
+properties: {
+  ..
+  ..
+  computedName: {
+    type: String,
+    notify: true,
+    computed: "_computeName(varA, varB)"
+  },
+
+  _computeName: function(varA, varB){
+    return varA + varB;
+  }
+}
+```
+          </script>
+        </marked-element>
+      </div>
+    </div>
+  </a-slide>
+
+  <a-slide>
+    <code-preview src="elements/properties-element.html"
+                  label="Properties example"
+                  size-that-fits
+                  fullscreen
+                  noprev
+                  content></code-preview>
+  </a-slide>
+
+  <a-slide>
+    <h1 header><span>Thank you</span></h1>
+    <div content>
+      <div class="card">
+        <h1>Questions?</h1>
+      </div>
+    </div>
+  </a-slide>
+
+</maps-chat-presi>
+</body>
+</html>

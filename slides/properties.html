@@ -1,0 +1,13 @@
+<script>
+  properties: {
+    computedName: {
+      type: String,
+          notify: true,
+          computed: "_computeName(varA, varB)"
+    },
+
+    _computeName: function(varA, varB){
+      return varA + varB;
+    }
+  }
+</script>

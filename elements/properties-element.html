@@ -1,0 +1,26 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="properties-element">
+  <template>
+    <style>
+      :host {
+        box-sizing: border-box;
+      }
+    </style>
+
+    <div>active: [[active]]</div>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'properties-element',
+
+      properties: {
+        active: {
+          type: Boolean
+        }
+      },
+    });
+  </script>
+</dom-module>

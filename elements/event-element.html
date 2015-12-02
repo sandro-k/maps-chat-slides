@@ -1,0 +1,26 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<dom-module id="event-element">
+  <template>
+    <style>
+      :host {
+        box-sizing: border-box;
+      }
+    </style>
+
+    <paper-button on-tap="_fireCustomEvent"></paper-button>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'event-element',
+
+      _fireCustomEvent: function(){
+        this.fire("make-it-run", {number: 42});
+      },
+
+    });
+  </script>
+</dom-module>

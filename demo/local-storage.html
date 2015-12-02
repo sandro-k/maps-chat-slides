@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+  <title>local-storage</title>
+
+  <script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
+  <link rel="import" href="../bower_components/paper-input/paper-input.html">
+</head>
+<body unresolved>
+<template is="dom-bind">
+  <iron-localstorage
+      name="just_a_unique_key"
+      value="{{values}}"
+      on-iron-localstorage-load-empty="initializeDefaultValue">
+  </iron-localstorage>
+
+    <template id="list" is="dom-repeat" items="[[values]]" as="value">
+      <paper-item on-tap="_remove">[[value]]</paper-item>
+    </template>
+
+  <paper-input label="Item"  value="{{itemName}}"></paper-input>
+  <paper-button on-tap="_addItem">ADD</paper-button>
+
+</template>
+<script>
+  var demo = document.querySelector('template');
+  demo.initializeDefaultValue = function(){
+    this.values = [];
+  }
+
+  demo._addItem = function(event){
+    this.push("values", this.itemName);
+  }.bind(demo);
+
+  demo._remove = function(event){
+    var item = this.$.list.itemForElement(event.target);
+    var index = this.values.indexOf(item);
+    this.splice("values", index, 1);
+  }.bind(demo);
+
+</script>
+</body>
+</html>
+
+
+
+

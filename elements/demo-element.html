@@ -1,0 +1,21 @@
+<template id="customTemplate">
+  <style>
+    p { color: orange; }
+  </style>
+  <p>
+    Whooo a custom HTML-Element!
+  </p>
+</template>
+<script>
+  var proto = Object.create(HTMLElement.prototype, {
+    createdCallback: {
+      value: function() {
+        var t = document.querySelector('#customTemplate');
+        var clone = document.importNode(t.content, true);
+        this.createShadowRoot().appendChild(clone);
+      }
+    }
+  });
+  console.log("aaa");
+  document.registerElement('demo-element', {prototype: proto});
+</script>

@@ -1,0 +1,150 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../bower_components/iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
+
+<link rel="import" href="../bower_components/neon-animation/neon-animatable.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animations.html">
+
+<!-- -->
+<dom-module id="maps-chat-presi">
+  <template>
+    <style>
+      :host {
+        box-sizing: border-box;
+        @apply(--layout);
+        @apply(--layout-vertical);
+      }
+    </style>
+
+
+    <neon-animated-pages id="pages"
+                         class="flex"
+                         selected="[[selected]]"
+                         entry-animation="[[entryAnimation]]"
+                         exit-animation="[[exitAnimation]]">
+      <content>
+      </content>
+    </neon-animated-pages>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'maps-chat-presi',
+
+      behaviors: [
+        Polymer.IronA11yKeysBehavior
+      ],
+
+      listeners: {
+        'neon-animation-finish': '_onNeonAnimationFinish'
+      },
+
+      properties: {
+
+        selected: {
+          type: Number,
+          notify: true,
+          value: 0
+        },
+
+        entryAnimation: {
+          type: String,
+          value: "slide-from-right-animation"
+        },
+
+        exitAnimation: {
+          type: String,
+          value: "slide-left-animation"
+        },
+
+        boundKeys: {
+          type: Array,
+          value: function () {
+            return Object.keys(this.keyBindings).join(' ').split(' ');
+          }
+        },
+        keyEventTarget: {
+          type: Object,
+          value: function () {
+            return document.body;
+          }
+        }
+      },
+
+      keyBindings: {
+        'left right down up': '_keyPressed'
+      },
+
+      keyActions: {
+        'left': '_gotBackOnePage',
+        'right': '_gotToNextPage'
+      },
+
+
+      ready: function () {
+      },
+
+      attached: function () {
+      },
+
+      detached: function () {
+      },
+
+      _onNeonAnimationFinish: function(){
+        console.log("_onNeonAnimationFinish", arguments);
+      },
+
+      _getNumberOfPages: function () {
+        return this.$.pages.items.length;
+      },
+
+      _setRightAnimation: function(){
+        this.entryAnimation = 'slide-from-right-animation';
+        this.exitAnimation = 'slide-left-animation';
+      },
+
+      _setLeftAnimation: function(){
+        this.entryAnimation = 'slide-from-left-animation';
+        this.exitAnimation = 'slide-right-animation';
+      },
+
+      _updatePageIndex: function(index){
+        this.$.pages.selected = index;
+      },
+
+      _gotToNextPage: function () {
+        console.log("_gotToNextPage", this.$.pages.activateEvent);
+        if(this.selected < this._getNumberOfPages() - 1) {
+          this._setRightAnimation();
+          this.selected = this.selected + 1;
+//          this.debounce("pageUpdate", this._debouncedPageUpdate, 300);
+          this._updatePageIndex(this.selected);
+        }
+      },
+
+      _gotBackOnePage: function () {
+        if(this.selected > 0) {
+          this._setLeftAnimation();
+          this.selected = this.selected - 1;
+//          this.debounce("pageUpdate", this._debouncedPageUpdate, 300);
+          this._updatePageIndex(this.selected);
+        }
+      },
+
+      _getActionForKey: function (key) {
+        return this.keyActions[key];
+      },
+
+      _keyPressed: function (event) {
+        console.log("_keyPressed", event.detail.combo);
+        var action = this._getActionForKey(event.detail.combo);
+        if (action && this[action]){
+          this[action]();
+        }
+      }
+
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,65 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animatable-behavior.html">
+<link rel="import" href="../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+
+<dom-module id="a-slide">
+  <link rel="import" type="css" href="a-slide.css">
+  <style is="custom-style">
+    :host {
+      /*display: block;*/
+      /*box-sizing: border-box;*/
+    }
+
+    h1 {
+    }
+
+    ::content {
+      background: green;
+    }
+
+    #external {
+      background: pink;
+    }
+  </style>
+  <template>
+    <iron-ajax handle-as="text" url="[[url]]" last-response="{{response}}" auto></iron-ajax>
+
+    <content select="[header]"></content>
+
+    <content select="[content]"></content>
+    <div id="external"></div>
+
+  </template>
+  <script>
+    Polymer({
+
+      is: 'a-slide',
+
+      behaviors: [
+        Polymer.NeonAnimatableBehavior,
+        Polymer.IronResizableBehavior
+      ],
+
+      properties: {
+        url: {
+          type: String
+        },
+
+        response: {
+          type: Object,
+          observer: "_responseChanged"
+        }
+      },
+
+      listeners: {},
+
+      _responseChanged: function (response) {
+        console.log("_responseChanged", response);
+        Polymer.dom(this.$.external).innerHTML = response;
+      }
+
+    });
+  </script>
+</dom-module>

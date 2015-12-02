@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- Copyright (c) 2015 Google Inc. All rights reserved. -->
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>Google Map demo</title>
+  <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="../bower_components/google-map/google-map.html">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+    }
+    google-map {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex: 1;
+    }
+  </style>
+</head>
+<body fullbleed>
+
+<google-map
+    latitude="53.5624"
+    longitude="9.9599"
+    min-zoom="9"
+    max-zoom="11">
+</google-map>
+
+</body>
+</html>

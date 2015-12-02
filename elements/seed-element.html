@@ -1,0 +1,37 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="seed-element">
+  <template></template>
+  <script>
+    Polymer({
+      is: 'seed-element',
+
+      properties: {
+        first: String,
+
+        last: {
+          type: String,
+          value: "default"
+        }
+      },
+
+      behaviors: [],
+      observers: ["_computeFullName(first, last)"],
+
+      listeners: {
+        'make-it-run': '_functionToCall'
+      },
+
+      ready: function () {},
+
+      attached: function () {},
+
+      detached: function () {},
+
+      _computeFullName: function(first, last){},
+
+      _functionToCall: function(e){}
+
+    });
+  </script>
+</dom-module>
